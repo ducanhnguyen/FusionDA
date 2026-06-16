@@ -66,8 +66,6 @@ datasets/
 └── target_fake/target_fake/{train,val}/{images,labels}     # dehazed (AOD-Net)
 ```
 
-The `_fake` directories are the Phase-1 outputs of [Depth-Anything-V2](https://github.com/khasnhmissu/Depth-Anything-V2) and [AOD-Net](https://github.com/khasnhmissu/AOD-Net) — clone those repos to regenerate the synthetic pairs from scratch. Test sets used in §4.4 (RTTS, Foggy Driving, FoggyZurich-test, WIDERFACE-easy) are downloaded separately from their original sources; see report §4.2.1.
-
 ### 3.2  Reproduce the full ablation
 
 ```bash
@@ -115,27 +113,3 @@ python yolo26eval.py \
 
 For the other backbones use `eval_v5m.py` (YOLOv5m) or `eval_r50fpn.py` (Faster R-CNN R50-FPN).
 
----
-
-## 4.  Headline results
-
-Numbers below are mAP<sub>50</sub> (%); **HM<sub>50</sub><sup>(3)</sup>** is the harmonic mean across clear / synthetic fog / natural fog (the latter averaged over RTTS, Foggy Driving, FoggyZurich-test). See report Table 4.4 for the complete grid.
-
-| Backbone | Method | Cityscapes | Foggy CS | RTTS | Foggy Drv. | Foggy Zur. | **HM<sub>50</sub><sup>(3)</sup>** ↑ |
-|---|---|---:|---:|---:|---:|---:|---:|
-| YOLO26-s | Full-finetune | 64.20 | 42.02 | 32.31 | 51.29 | 20.93 | 44.07 |
-| YOLO26-s | **FusionDA** (ours) | 61.31 | **54.03** | **57.18** | **59.01** | **30.10** | **54.22** |
-| YOLO26-l | Full-finetune | 69.28 | 52.65 | 38.17 | 53.81 | 19.22 | 49.67 |
-| YOLO26-l | **FusionDA** (ours) | 65.05 | **59.53** | **47.23** | **59.95** | **29.10** | **55.37** |
-| YOLOv5-m | ALDI++ | 50.47 | 49.41 | 44.43 | 42.70 | 27.67 | 45.32 |
-| YOLOv5-m | **FusionDA** (ours) | 57.26 | 47.40 | **47.46** | **53.12** | 24.52 | **47.97** |
-| R50-FPN | DA-Detect | 55.79 | 48.15 | 37.19 | 48.23 | 28.53 | 46.14 |
-| R50-FPN | ALDI++ | 53.76 | 48.30 | 37.99 | 46.73 | 26.97 | 45.34 |
-| R50-FPN | **FusionDA** (ours) | 53.06 | 48.01 | **46.01** | **48.45** | 26.24 | **46.49** |
-
-Highlights (report §4.4):
-- **Best multi-domain balance.** FusionDA tops HM<sub>50</sub><sup>(3)</sup> in 6 / 7 backbones tested.
-- **Zero-shot generalisation to natural fog.** FusionDA-s improves RTTS by **+24.87 mAP<sub>50</sub> (+77.0% relative)** over the baseline — the largest single-dataset improvement in the study.
-- **Most gains come from small/medium objects.** APS on RTTS improves by +128% on YOLO26-s, addressing the classical small-object weakness of detectors under fog.
-- **No catastrophic forgetting.** Clear-domain drop is small (−2.89 on YOLOv5-m vs. ALDI++'s −4.49).
-- **Feature space genuinely aligned.** MMD between clear/foggy features drops from 2.55 × 10⁻³ (Baseline) to ≈ 0 (FusionDA), with UMAP and C2PSA attention maps confirming local alignment beyond what MMD measures.
